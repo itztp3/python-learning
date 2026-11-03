@@ -1,145 +1,52 @@
-import json
-import os
+print("===== SMART TRAVEL FARE ESTIMATOR =====")
 
-FILE_NAME = "event_data.json"
-MAX_SEATS = 50
+print("\n1. Bus")
+print("2. Metro")
+print("3. Cab")
 
+choice = int(input("\nChoose transport (1-3): "))
 
-def load_data():
-    if os.path.exists(FILE_NAME):
-        try:
-            with open(FILE_NAME, "r") as file:
-                return json.load(file)
-        except (json.JSONDecodeError, OSError):
-            print("Could not read saved data.")
-    return []
+distance = float(input("Enter distance (KM): "))
 
+student = input("Are you a student? (yes/no): ").lower()
 
-def save_data(participants):
-    with open(FILE_NAME, "w") as file:
-        json.dump(participants, file, indent=4)
+if distance <= 0:
+    print("Invalid distance!")
 
+else:
+    if choice == 1:
+        transport = "Bus"
+        rate = 10
 
-def register_participant(participants):
-    if len(participants) >= MAX_SEATS:
-        print("Sorry! All seats are booked.")
-        return
+    elif choice == 2:
+        transport = "Metro"
+        rate = 15
 
-    name = input("Enter participant name: ").strip()
-    email = input("Enter email: ").strip()
+    elif choice == 3:
+        transport = "Cab"
+        rate = 25
 
-    if not name or not email or "@" not in email:
-        print("Please enter valid details.")
-        return
-
-    registration_id = max(
-        [p["id"] for p in participants], default=1000
-    ) + 1
-
-    participant = {
-        "id": registration_id,
-        "name": name,
-        "email": email
-    }
-
-    participants.append(participant)
-    save_data(participants)
-
-    print("\nRegistration successful!")
-    print("Registration ID:", registration_id)
-
-
-def view_participants(participants):
-    if not participants:
-        print("No registrations found.")
-        return
-
-    print("\n--- REGISTERED PARTICIPANTS ---")
-
-    for person in participants:
-        print(
-            f"ID: {person['id']} | "
-            f"Name: {person['name']} | "
-            f"Email: {person['email']}"
-        )
-
-
-def search_participant(participants):
-    name = input("Enter name to search: ").strip().lower()
-
-    found = [
-        person for person in participants
-        if name in person["name"].lower()
-    ]
-
-    if found:
-        for person in found:
-            print(person)
     else:
-        print("Participant not found.")
+        transport = None
 
+    if transport is None:
+        print("Invalid transport choice!")
 
-def cancel_registration(participants):
-    try:
-        reg_id = int(input("Enter registration ID: "))
-    except ValueError:
-        print("Please enter a valid ID.")
-        return
+    else:
+        original_fare = distance * rate
 
-    for person in participants:
-        if person["id"] == reg_id:
-            participants.remove(person)
-            save_data(participants)
-            print("Registration cancelled successfully.")
-            return
-
-    print("Registration ID not found.")
-
-
-def show_seats(participants):
-    available = MAX_SEATS - len(participants)
-
-    print("Total seats:", MAX_SEATS)
-    print("Booked seats:", len(participants))
-    print("Available seats:", available)
-
-
-def main():
-    participants = load_data()
-
-    while True:
-        print("\n===== EVENT MANAGEMENT SYSTEM =====")
-        print("1. Register Participant")
-        print("2. View Participants")
-        print("3. Search Participant")
-        print("4. Cancel Registration")
-        print("5. Check Seat Availability")
-        print("6. Exit")
-
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            register_participant(participants)
-
-        elif choice == "2":
-            view_participants(participants)
-
-        elif choice == "3":
-            search_participant(participants)
-
-        elif choice == "4":
-            cancel_registration(participants)
-
-        elif choice == "5":
-            show_seats(participants)
-
-        elif choice == "6":
-            print("Thank you for using Event Manager!")
-            break
-
+        if student == "yes":
+            discount = original_fare * 0.10
         else:
-            print("Invalid choice. Try again.")
+            discount = 0
 
+        final_fare = original_fare - discount
 
-if __name__ == "__main__":
-    main()
+        print("\n===== TRAVEL FARE RECEIPT =====")
+        print("Transport:", transport)
+        print("Distance:", distance, "KM")
+        print("Original Fare: ₹", original_fare)
+        print("Student Discount: ₹", discount)
+        print("Final Fare: ₹", final_fare)
+
+        print("\nThank you for travelling!")
